@@ -1,0 +1,54 @@
+
+name: projek-akso
+
+services:
+  webserver:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    configs:
+      - source: html_config_1
+        target: /usr/share/nginx/html/index.html
+      - source: html_config_2
+        target: /usr/share/nginx/html/coba.html
+
+        
+  postgres:
+    container_name: postgres
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - network1
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  pg-admin:
+    container_name: pg-admin
+    image: dpage/pgadmin4:8.12
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - "5050:5050"
+    networks:
+      - network1
+    
+volumes:
+  data:
+
+networks:
+  network1:
+    driver: bridge
+
+configs:
+  html_config_1:
+    file: ./index.html
+  html_config_2:
+    file: ./coba.html
+

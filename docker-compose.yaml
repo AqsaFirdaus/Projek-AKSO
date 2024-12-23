@@ -1,0 +1,81 @@
+name: projek-akso
+
+services:
+  webserver:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    configs:
+      - source: html_config_1
+        target: /usr/share/nginx/html/index.html
+      - source: html_config_2
+        target: /usr/share/nginx/html/coba.html
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 2G
+    environment:
+      - ENV=production
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+
+  postgres:
+    container_name: postgres
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - network1
+    volumes:
+      - data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    restart: always
+
+  pg-admin:
+    container_name: pg-admin
+    image: dpage/pgadmin4:8.12
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - "5050:5050"
+    networks:
+      - network1
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+
+volumes:
+  data:
+
+networks:
+  network1:
+    driver: bridge
+
+configs:
+  html_config_1:
+    file: ./index.html
+  html_config_2:
+    file: ./coba.html
